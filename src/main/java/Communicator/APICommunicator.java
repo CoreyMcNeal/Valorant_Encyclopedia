@@ -7,7 +7,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.Console;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -17,7 +16,9 @@ import java.util.*;
 
 public class APICommunicator {
 
-    public static boolean connectAgentInfo() {
+                                                                //Tests API connection, calls getAgentJSON if successful
+    public static List<Map<String, String>> connectAgentInfo() {
+
         Scanner myScanner = new Scanner(System.in);
 
         try {
@@ -28,14 +29,15 @@ public class APICommunicator {
 
             int responseCode = myConn.getResponseCode();
             if (responseCode == 200) {
-                getAgentJSON(myURL);
-                return true;
+
+                return getAgentJSON(myURL);
 
             } else {
                 System.out.println("\nFailed to connect\n" +
                         "Push enter to retry connection");
                 myScanner.nextLine();
-                return false;
+                return null;
+
             }
 
 
@@ -43,12 +45,13 @@ public class APICommunicator {
             System.out.println("\nError with URL\n" +
                                 "Push enter to retry connection");
             myScanner.nextLine();
-            return false;
+            return null;
+
         } catch (IOException e) {
             System.out.println("\nError with HTTP conversion\n" +
                                 "Push enter to retry connection");
             myScanner.nextLine();
-            return false;
+            return null;
         }
     }
 
@@ -122,18 +125,22 @@ public class APICommunicator {
             if (responseCode == 200) {
 //                getAgentJSON(myURL);
                 return true;
+
             } else {
                 System.out.println("Failed to connect");
                 return false;
+
             }
 
 
         } catch (MalformedURLException e) {
             System.out.println("Error with URL");
             return false;
+
         } catch (IOException e) {
             System.out.println("Error with HTTP conversion");
             return false;
+
         }
     }
 
@@ -142,8 +149,8 @@ public class APICommunicator {
 
 
 
-
-    private static void getAgentJSON(URL myUrl) {
+                                                                        // Grabs Valorant agent info from API
+    private static List<Map<String, String>> getAgentJSON(URL myUrl) {
 
         List< Map<String,String>> allAgentInformation = new ArrayList<>();
 
@@ -184,6 +191,7 @@ public class APICommunicator {
                     if (name.equals("Sova") && posCounter == 6) {
                         posCounter += 1;
                         continue;
+
                     } else {
                         JSONObject roleData = (JSONObject) data.get("role");
                         role = roleData.get("displayName").toString();
@@ -200,19 +208,20 @@ public class APICommunicator {
                     JSONObject abilityInfo2 = (JSONObject) abilities.get(2);
                     String abilityName2 = abilityInfo2.get("displayName").toString();
 
-                    JSONObject abilityInfo3 = (JSONObject) abilities.get(3);
-                    String abilityName3 = abilityInfo3.get("displayName").toString();
+                    JSONObject ultimate = (JSONObject) abilities.get(3);
+                    String ultimateName = ultimate.get("displayName").toString();
 
 
-                    //Create list and add this agent list to the bigger list of all characters
+                    //Create map/dictionary and adds this agent map to the bigger list of all characters
                     Map<String, String> agentInformation = new HashMap<>();
                     agentInformation.put("name", name);
-                    agentInformation.put("description", description);
                     agentInformation.put("role", role);
+
                     agentInformation.put("abilityName0", abilityName0);
                     agentInformation.put("abilityName1", abilityName1);
                     agentInformation.put("abilityName2", abilityName2);
-                    agentInformation.put("abilityName3", abilityName3);
+                    agentInformation.put("ultimateName", ultimateName);
+
 
                     allAgentInformation.add(agentInformation);
 
@@ -223,11 +232,11 @@ public class APICommunicator {
                 }
             }
 
-            System.out.println(allAgentInformation);
-
+            return allAgentInformation;
 
         } catch (IOException | ParseException e) {
             e.printStackTrace();
+            return null;
         }
         
     }
