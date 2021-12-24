@@ -40,7 +40,8 @@ public class ClientApp {
                     continue;
 
                 case "2": // Weapons
-
+                    WeaponMenu();
+                    continue;
 
                 case "3": // Maps
 
@@ -61,7 +62,7 @@ public class ClientApp {
                                             //Retrieves and handles the character selection process
     private static void CharactersMenu() {
         while (allAgentsInformation == null) {
-            allAgentsInformation = APICommunicator.connectAgentInfo();
+            allAgentsInformation = APICommunicator.pingAgentInfo();
         }
 
         while (true) {
@@ -105,17 +106,44 @@ public class ClientApp {
     private static void WeaponMenu() {
         //Expand on weapon part here, name, damage, cost, etc.
         while (allWeaponsInformation == null) {
-            allWeaponsInformation = APICommunicator.connectWeaponInfo();
+            allWeaponsInformation = APICommunicator.pingWeaponInfo();
+
         }
 
-        
+
+
+        while (true) {
+
+            System.out.println("\nWhich weapon would you like to learn more about (Enter -1 to exit): ");
+            for(int i = 0; i < allWeaponsInformation.size(); i++) {
+                System.out.print(i + " - ");
+                System.out.println(allWeaponsInformation.get(i).get("name"));
+            }
+
+            int userChoice;
+            while (true) {
+                try {
+                    System.out.print(":: ");
+                    userChoice = Integer.parseInt(myScanner.nextLine());
+                    if (userChoice < -1 || userChoice > (allWeaponsInformation.size() - 1)) {
+                        throw new Exception();
+                    }
+                    break;
+
+                } catch (Exception e) {
+                    System.out.println("Please enter a valid number of one of the weapons.");
+
+                }
+            }
+
+            if (userChoice == -1) {break;}
+
+            printWeaponInformation(allWeaponsInformation, userChoice);
+            myScanner.nextLine();
+        }
+
+
     }
-
-
-
-
-
-
 
 
 
@@ -131,6 +159,18 @@ public class ClientApp {
         System.out.println("Ability 2: " + allAgentsInformation.get(userChoice).get("abilityName1"));
         System.out.println("Ability 3: " + allAgentsInformation.get(userChoice).get("abilityName2"));
         System.out.println("Ultimate: " + allAgentsInformation.get(userChoice).get("ultimateName"));
+
+        System.out.print("\n:: Push enter to return");
+
+    }
+                                                                    //prints relevant weapons information
+    private static void printWeaponInformation (List<Map<String, String>> allWeaponInformation, int userChoice) {
+
+        System.out.println("\nWeapon Name: " + allWeaponInformation.get(userChoice).get("name"));
+        System.out.println("Fire Rate: " + allWeaponInformation.get(userChoice).get("fireRate"));
+        System.out.println("Magazine Size: " + allWeaponInformation.get(userChoice).get("magazineSize"));
+        System.out.println("Reload Time: " + allWeaponInformation.get(userChoice).get("reloadTimeSeconds") + " seconds");
+        System.out.println("Equip Time: " + allWeaponInformation.get(userChoice).get("equipTimeSeconds") + " seconds");
 
         System.out.print("\n:: Push enter to return");
 

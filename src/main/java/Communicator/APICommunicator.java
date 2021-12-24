@@ -16,10 +16,10 @@ import java.util.*;
 
 public class APICommunicator {
 
-                                                                //Tests API connection, calls getAgentJSON if successful
-    public static List<Map<String, String>> connectAgentInfo() {
+    private static Scanner myScanner = new Scanner(System.in);
 
-        Scanner myScanner = new Scanner(System.in);
+                                                                //Tests API connection, calls getAgentJSON if successful
+    public static List<Map<String, String>> pingAgentInfo() {
 
         try {
             URL myURL = new URL("https://valorant-api.com/v1/agents");
@@ -56,9 +56,7 @@ public class APICommunicator {
     }
 
 
-
-
-    public static List<Map<String, String>> connectWeaponInfo() {
+    public static List<Map<String, String>> pingWeaponInfo() {
 
         try {
             URL myURL = new URL("https://valorant-api.com/v1/weapons");
@@ -68,10 +66,13 @@ public class APICommunicator {
 
             int responseCode = myConn.getResponseCode();
             if (responseCode == 200) {
-                return getAgentJSON(myURL);
+
+                return getWeaponJSON(myURL);
 
             } else {
-                System.out.println("Failed to connect");
+                System.out.println("\nFailed to connect\n" +
+                        "Push enter to retry connection");
+                myScanner.nextLine();
                 return null;
             }
 
@@ -88,7 +89,7 @@ public class APICommunicator {
     }
 
 
-    public static boolean connectMapInfo() {
+    public static boolean pingMapInfo() {
 
         try {
             URL myURL = new URL("https://valorant-api.com/v1/maps");
@@ -156,7 +157,6 @@ public class APICommunicator {
 
         List< Map<String,String>> allAgentInformation = new ArrayList<>();
 
-        JSONObject temp = null;
         try {
 
             String content = "";
@@ -181,12 +181,10 @@ public class APICommunicator {
             while (true) {
                 try {
 
-                    //Keys into the first agent
+                    //Keys into the agent
                     JSONObject data = (JSONObject) myArrayObject.get(posCounter);
 
-                    //Keys into the different entries of that agent
                     String name = data.get("displayName").toString();
-                    String description = data.get("description").toString();
 
                     //For the edge case of Sova, there is an entry in the JSON that is empty at position 6, skips it
                     String role;
@@ -243,10 +241,12 @@ public class APICommunicator {
         
     }
 
-    private static void getWeaponJSON(URL myUrl) {
+    private static List<Map<String, String>> getWeaponJSON(URL myUrl) {
 
-        JSONObject temp = null;
+        List< Map<String, String>> allWeaponsList = new ArrayList<>();
+
         try {
+
             String content = "";
             Scanner myScanner = new Scanner(myUrl.openStream());
 
@@ -264,19 +264,45 @@ public class APICommunicator {
             //Keys into general data, returns array/list
             JSONArray myArrayObject = (JSONArray) myDataObject.get("data");
 
-            //Keys into the first weapon
-            JSONObject data = (JSONObject) myArrayObject.get(0);
+            //Loops through each agent entry in the array, pulls necessary information
+            int posCounter = 0;
+            while (true) {
+                try {
 
-            //Keys into the display name of that agent
-            String name = data.get("description").toString();
+                    //Keys into the agent
+                    JSONObject data = (JSONObject) myArrayObject.get(posCounter);
+                    String name = data.get("displayName").toString();
 
-            System.out.println(name);
-            //Pick up here next time
+                    JSONObject weaponStats = (JSONObject) data.get("weaponStats");
+                    String fireRate = weaponStats.get("fireRate").toString();
+                    String magazineSize = weaponStats.get("magazineSize").toString();
+                    String reloadTimeSeconds = weaponStats.get("reloadTimeSeconds").toString();
+                    String equipTimeSeconds = weaponStats.get("equipTimeSeconds").toString();
+
+                    //Adding name to the individual map here, need to add map to the big list of weapons. Gather other
+                    //info like damage
+                    Map<String, String> weaponEntry = new HashMap<>();
+                    weaponEntry.put("name", name);
+                    weaponEntry.put("fireRate", fireRate);
+                    weaponEntry.put("magazineSize", magazineSize);
+                    weaponEntry.put("reloadTimeSeconds", reloadTimeSeconds);
+                    weaponEntry.put("equipTimeSeconds", equipTimeSeconds);
 
 
+                    allWeaponsList.add(weaponEntry);
+                    posCounter += 1;
+
+                } catch (Exception e) {
+                    break;
+                }
+            }
+
+
+            return allWeaponsList;
 
         } catch (IOException | ParseException e) {
             e.printStackTrace();
+            return null;
         }
 
     }
