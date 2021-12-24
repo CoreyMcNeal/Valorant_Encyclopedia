@@ -58,7 +58,7 @@ public class APICommunicator {
 
 
 
-    public static boolean connectWeaponInfo() {
+    public static List<Map<String, String>> connectWeaponInfo() {
 
         try {
             URL myURL = new URL("https://valorant-api.com/v1/weapons");
@@ -68,20 +68,22 @@ public class APICommunicator {
 
             int responseCode = myConn.getResponseCode();
             if (responseCode == 200) {
-                getAgentJSON(myURL);
-                return true;
+                return getAgentJSON(myURL);
+
             } else {
                 System.out.println("Failed to connect");
-                return false;
+                return null;
             }
 
 
         } catch (MalformedURLException e) {
             System.out.println("Error with URL");
-            return false;
+            return null;
+
         } catch (IOException e) {
             System.out.println("Error with HTTP conversion");
-            return false;
+            return null;
+
         }
     }
 
@@ -262,7 +264,7 @@ public class APICommunicator {
             //Keys into general data, returns array/list
             JSONArray myArrayObject = (JSONArray) myDataObject.get("data");
 
-            //Keys into the first agent
+            //Keys into the first weapon
             JSONObject data = (JSONObject) myArrayObject.get(0);
 
             //Keys into the display name of that agent

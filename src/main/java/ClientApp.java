@@ -9,6 +9,7 @@ public class ClientApp {
 
     private static final Scanner myScanner = new Scanner(System.in);
     private static List<Map<String, String>> allAgentsInformation = null;
+    private static List<Map<String, String>> allWeaponsInformation = null;
 
     public static void main(String[] args) {
         UIStart();
@@ -88,23 +89,50 @@ public class ClientApp {
 
             if (userChoice == -1) {break;}
 
-            System.out.println("\nName: " + allAgentsInformation.get(userChoice).get("name"));
-            System.out.println("Role: " + allAgentsInformation.get(userChoice).get("role"));
-//         
-            System.out.println("Ability 1: " + allAgentsInformation.get(userChoice).get("abilityName0"));
-            System.out.println("Ability 2: " + allAgentsInformation.get(userChoice).get("abilityName1"));
-            System.out.println("Ability 3: " + allAgentsInformation.get(userChoice).get("abilityName2"));
-            System.out.println("Ultimate: " + allAgentsInformation.get(userChoice).get("ultimateName"));
-
-            System.out.print("\n:: Push enter to return");
-
-            //Add descriptions to abilities, start from here next
+            printAgentInformation(allAgentsInformation, userChoice);
 
             myScanner.nextLine();
         }
 
 
 
+
+
+
+
+    }
+
+    private static void WeaponMenu() {
+        //Expand on weapon part here, name, damage, cost, etc.
+        while (allWeaponsInformation == null) {
+            allWeaponsInformation = APICommunicator.connectWeaponInfo();
+        }
+
+        
+    }
+
+
+
+
+
+
+
+
+
+
+
+                                                                //prints relevant agents information
+    private static void printAgentInformation (List< Map<String, String>> allAgentsInformationList, int userChoice) {
+
+        System.out.println("\nName: " + allAgentsInformation.get(userChoice).get("name"));
+        System.out.println("Role: " + allAgentsInformation.get(userChoice).get("role"));
+
+        System.out.println("Ability 1: " + allAgentsInformation.get(userChoice).get("abilityName0"));
+        System.out.println("Ability 2: " + allAgentsInformation.get(userChoice).get("abilityName1"));
+        System.out.println("Ability 3: " + allAgentsInformation.get(userChoice).get("abilityName2"));
+        System.out.println("Ultimate: " + allAgentsInformation.get(userChoice).get("ultimateName"));
+
+        System.out.print("\n:: Push enter to return");
 
     }
 
