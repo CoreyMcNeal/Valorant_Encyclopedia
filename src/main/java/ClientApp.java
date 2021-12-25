@@ -42,7 +42,7 @@ public class ClientApp {
                     continue;
 
                 case "3": // Maps, start here next
-
+                    MapsMenu(myScanner, myCommunicator);
                     continue;
 
                 case "4": // Modes
@@ -108,14 +108,12 @@ public class ClientApp {
 
                                             //Retrieves List<Map<>> and handles the weapon selection process
     private static void WeaponMenu(Scanner myScanner,APICommunicator myCommunicator) {
-        //Expand on weapon part here, name, damage, cost, etc.
+
         List<Map<String,String>> allWeaponsInformation = null;
         while (allWeaponsInformation == null) {
             allWeaponsInformation = myCommunicator.pingWeaponInfo();
 
         }
-
-
 
         while (true) {
 
@@ -146,7 +144,19 @@ public class ClientApp {
             printWeaponInformation(allWeaponsInformation, userChoice);
             myScanner.nextLine();
         }
+    }
 
+                                            //Retrieves List<String> and handles the Map display process
+    private static void MapsMenu(Scanner myScanner, APICommunicator myCommunicator) {
+
+        List<String> allMapsInformation = null;
+        while (allMapsInformation == null) {
+            allMapsInformation = myCommunicator.pingMapInfo();
+
+        }
+
+        printMapInformation(allMapsInformation);
+        myScanner.nextLine();
 
     }
 
@@ -166,6 +176,7 @@ public class ClientApp {
         System.out.print("\n:: Push enter to return");
 
     }
+
                                                                     //prints relevant weapons information
     private static void printWeaponInformation (List<Map<String, String>> allWeaponInformation, int userChoice) {
 
@@ -176,8 +187,20 @@ public class ClientApp {
         System.out.println("Equip Time: " + allWeaponInformation.get(userChoice).get("equipTimeSeconds") + " seconds");
         System.out.println("Cost - " + allWeaponInformation.get(userChoice).get("cost") + " credits");
 
-        System.out.print("\n:: Push enter to return");
+        System.out.print("\n:: Push enter to return ");
 
     }
 
+                                                                    //prints map information
+    private static void printMapInformation (List<String> allMapInformation) {
+        System.out.println("\n");
+
+        int i = 0;
+        while (i < allMapInformation.size()) {
+            System.out.println("Map: " + allMapInformation.get(i));
+            i++;
+        }
+
+        System.out.print("\n:: Push enter to return");
+    }
 }

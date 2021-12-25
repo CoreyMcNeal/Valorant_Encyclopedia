@@ -93,7 +93,7 @@ public class APICommunicator {
     }
 
 
-    public boolean pingMapInfo() {
+    public List<String> pingMapInfo() {
 
         try {
             URL myURL = new URL("https://valorant-api.com/v1/maps");
@@ -103,20 +103,24 @@ public class APICommunicator {
 
             int responseCode = myConn.getResponseCode();
             if (responseCode == 200) {
-                getAgentJSON(myURL);
-                return true;
+
+                return getMapJSON(myURL);
+
             } else {
-                System.out.println("Failed to connect");
-                return false;
+                System.out.println("\nFailed to connect\n" +
+                        "Push enter to retry connection");
+                this.myScanner.nextLine();
+                return null;
+
             }
 
 
         } catch (MalformedURLException e) {
             System.out.println("Error with URL");
-            return false;
+            return null;
         } catch (IOException e) {
             System.out.println("Error with HTTP conversion");
-            return false;
+            return null;
         }
     }
 
@@ -253,14 +257,13 @@ public class APICommunicator {
         try {
 
             StringBuilder content = new StringBuilder();
-            Scanner myScanner = new Scanner(myUrl.openStream());
+            Scanner urlScanner = new Scanner(myUrl.openStream());
 
             //Write JSON data into string
-            while(myScanner.hasNext()) {
-                content.append(myScanner.nextLine());
+            while(urlScanner.hasNext()) {
+                content.append(urlScanner.nextLine());
             }
-
-            myScanner.close();
+            urlScanner.close();
 
             //Creates parser, and parses the content into a JSONOBject
             JSONParser myParser = new JSONParser();
@@ -299,7 +302,7 @@ public class APICommunicator {
 
 
                     allWeaponsList.add(weaponEntry);
-                    posCounter += 1;
+                    posCounter ++;
 
                 } catch (Exception e) {
                     break;
@@ -316,4 +319,47 @@ public class APICommunicator {
 
     }
 
+    private List<String> getMapJSON (URL myURL) {
+
+        List<String> allMapList = new ArrayList<>();
+
+        try {
+
+            StringBuilder content = new StringBuilder();
+            Scanner urlScanner = new Scanner(myURL.openStream());
+
+            while (urlScanner.hasNext()) {
+                content.append(urlScanner.nextLine());
+            }
+            urlScanner.close();
+
+            JSONParser myParser = new JSONParser();
+            JSONObject myDataObject = (JSONObject) myParser.parse(content.toString());
+
+            JSONArray myArrayObject = (JSONArray) myDataObject.get("data");
+
+            int posCounter = 0;
+            while (true) {
+
+                try {
+
+                    JSONObject data =  (JSONObject) myArrayObject.get(posCounter);
+                    String mapName = data.get("displayName").toString();
+
+                    allMapList.add(mapName);
+                    posCounter++;
+                } catch(Exception e) {
+                    break;
+                }
+
+            }
+
+            return allMapList;
+
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
 }
