@@ -1,22 +1,20 @@
 import Communicator.APICommunicator;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
 public class ClientApp {
 
-    private static final Scanner myScanner = new Scanner(System.in);
-    private static List<Map<String, String>> allAgentsInformation = null;
-    private static List<Map<String, String>> allWeaponsInformation = null;
-
     public static void main(String[] args) {
-        UIStart();
+        Scanner myScanner = new Scanner(System.in);
+        APICommunicator apiCommunicator = new APICommunicator(myScanner);
+
+        UIStart(myScanner, apiCommunicator);
     }
 
     //Starts the Interface
-    private static void UIStart() {
+    private static void UIStart(Scanner myScanner, APICommunicator myCommunicator) {
 
         System.out.println("\nWelcome to the Valorant Info Client");
 
@@ -36,17 +34,20 @@ public class ClientApp {
             switch (userChoice) {
 
                 case "1":                 //Characters
-                    CharactersMenu();
+                    CharactersMenu(myScanner, myCommunicator);
                     continue;
 
                 case "2": // Weapons
-                    WeaponMenu();
+                    WeaponMenu(myScanner, myCommunicator);
                     continue;
 
-                case "3": // Maps
+                case "3": // Maps, start here next
 
+                    continue;
 
                 case "4": // Modes
+
+                    continue;
 
                 case "5": // Exits the program
                     leaveProgram = true;
@@ -59,10 +60,12 @@ public class ClientApp {
 
     }
 
-                                            //Retrieves and handles the character selection process
-    private static void CharactersMenu() {
+                                            //Retrieves List<Map<>> and handles the character selection process
+    private static void CharactersMenu(Scanner myScanner, APICommunicator myCommunicator) {
+
+        List<Map<String,String>> allAgentsInformation = null;
         while (allAgentsInformation == null) {
-            allAgentsInformation = APICommunicator.pingAgentInfo();
+            allAgentsInformation = myCommunicator.pingAgentInfo();
         }
 
         while (true) {
@@ -103,10 +106,12 @@ public class ClientApp {
 
     }
 
-    private static void WeaponMenu() {
+                                            //Retrieves List<Map<>> and handles the weapon selection process
+    private static void WeaponMenu(Scanner myScanner,APICommunicator myCommunicator) {
         //Expand on weapon part here, name, damage, cost, etc.
+        List<Map<String,String>> allWeaponsInformation = null;
         while (allWeaponsInformation == null) {
-            allWeaponsInformation = APICommunicator.pingWeaponInfo();
+            allWeaponsInformation = myCommunicator.pingWeaponInfo();
 
         }
 
@@ -147,10 +152,8 @@ public class ClientApp {
 
 
 
-
-
                                                                 //prints relevant agents information
-    private static void printAgentInformation (List< Map<String, String>> allAgentsInformationList, int userChoice) {
+    private static void printAgentInformation (List< Map<String, String>> allAgentsInformation, int userChoice) {
 
         System.out.println("\nName: " + allAgentsInformation.get(userChoice).get("name"));
         System.out.println("Role: " + allAgentsInformation.get(userChoice).get("role"));
@@ -171,6 +174,7 @@ public class ClientApp {
         System.out.println("Magazine Size: " + allWeaponInformation.get(userChoice).get("magazineSize"));
         System.out.println("Reload Time: " + allWeaponInformation.get(userChoice).get("reloadTimeSeconds") + " seconds");
         System.out.println("Equip Time: " + allWeaponInformation.get(userChoice).get("equipTimeSeconds") + " seconds");
+        System.out.println("Cost - " + allWeaponInformation.get(userChoice).get("cost") + " credits");
 
         System.out.print("\n:: Push enter to return");
 

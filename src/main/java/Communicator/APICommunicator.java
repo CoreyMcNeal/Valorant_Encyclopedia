@@ -16,10 +16,14 @@ import java.util.*;
 
 public class APICommunicator {
 
-    private static Scanner myScanner = new Scanner(System.in);
+    private final Scanner myScanner;
+
+    public APICommunicator(Scanner passedScanner) {
+        this.myScanner = passedScanner;
+    }
 
                                                                 //Tests API connection, calls getAgentJSON if successful
-    public static List<Map<String, String>> pingAgentInfo() {
+    public List<Map<String, String>> pingAgentInfo() {
 
         try {
             URL myURL = new URL("https://valorant-api.com/v1/agents");
@@ -35,7 +39,7 @@ public class APICommunicator {
             } else {
                 System.out.println("\nFailed to connect\n" +
                         "Push enter to retry connection");
-                myScanner.nextLine();
+                this.myScanner.nextLine();
                 return null;
 
             }
@@ -55,8 +59,8 @@ public class APICommunicator {
         }
     }
 
-
-    public static List<Map<String, String>> pingWeaponInfo() {
+                                                            //Tests API connection, calls getWeaponJSON if successful
+    public List<Map<String, String>> pingWeaponInfo() {
 
         try {
             URL myURL = new URL("https://valorant-api.com/v1/weapons");
@@ -72,7 +76,7 @@ public class APICommunicator {
             } else {
                 System.out.println("\nFailed to connect\n" +
                         "Push enter to retry connection");
-                myScanner.nextLine();
+                this.myScanner.nextLine();
                 return null;
             }
 
@@ -89,7 +93,7 @@ public class APICommunicator {
     }
 
 
-    public static boolean pingMapInfo() {
+    public boolean pingMapInfo() {
 
         try {
             URL myURL = new URL("https://valorant-api.com/v1/maps");
@@ -116,7 +120,7 @@ public class APICommunicator {
         }
     }
 
-    public static boolean pingModesInfo() {
+    public boolean pingModesInfo() {
 
         try {
             URL myURL = new URL("https://valorant-api.com/v1/gamemodes");
@@ -153,25 +157,25 @@ public class APICommunicator {
 
 
                                                                         // Grabs Valorant agent info from API
-    private static List<Map<String, String>> getAgentJSON(URL myUrl) {
+    private List<Map<String, String>> getAgentJSON(URL myUrl) {
 
         List< Map<String,String>> allAgentInformation = new ArrayList<>();
 
         try {
 
-            String content = "";
+            StringBuilder content = new StringBuilder();
             Scanner myScanner = new Scanner(myUrl.openStream());
 
             //Write JSON data into string
             while(myScanner.hasNext()) {
-                content += myScanner.nextLine();
+                content.append(myScanner.nextLine());
             }
 
             myScanner.close();
 
             //Creates parser, and parses the content into a JSONOBject
             JSONParser myParser = new JSONParser();
-            JSONObject myDataObject = (JSONObject) myParser.parse(content);
+            JSONObject myDataObject = (JSONObject) myParser.parse(content.toString());
 
             //Keys into general data, returns array/list
             JSONArray myArrayObject = (JSONArray) myDataObject.get("data");
@@ -241,25 +245,26 @@ public class APICommunicator {
         
     }
 
-    private static List<Map<String, String>> getWeaponJSON(URL myUrl) {
+                                                                        // Grabs Valorant Weapon info from API
+    private List<Map<String, String>> getWeaponJSON(URL myUrl) {
 
         List< Map<String, String>> allWeaponsList = new ArrayList<>();
 
         try {
 
-            String content = "";
+            StringBuilder content = new StringBuilder();
             Scanner myScanner = new Scanner(myUrl.openStream());
 
             //Write JSON data into string
             while(myScanner.hasNext()) {
-                content += myScanner.nextLine();
+                content.append(myScanner.nextLine());
             }
 
             myScanner.close();
 
             //Creates parser, and parses the content into a JSONOBject
             JSONParser myParser = new JSONParser();
-            JSONObject myDataObject = (JSONObject) myParser.parse(content);
+            JSONObject myDataObject = (JSONObject) myParser.parse(content.toString());
 
             //Keys into general data, returns array/list
             JSONArray myArrayObject = (JSONArray) myDataObject.get("data");
@@ -279,6 +284,9 @@ public class APICommunicator {
                     String reloadTimeSeconds = weaponStats.get("reloadTimeSeconds").toString();
                     String equipTimeSeconds = weaponStats.get("equipTimeSeconds").toString();
 
+                    JSONObject shopData = (JSONObject) data.get("shopData");
+                    String cost = shopData.get("cost").toString();
+
                     //Adding name to the individual map here, need to add map to the big list of weapons. Gather other
                     //info like damage
                     Map<String, String> weaponEntry = new HashMap<>();
@@ -287,6 +295,7 @@ public class APICommunicator {
                     weaponEntry.put("magazineSize", magazineSize);
                     weaponEntry.put("reloadTimeSeconds", reloadTimeSeconds);
                     weaponEntry.put("equipTimeSeconds", equipTimeSeconds);
+                    weaponEntry.put("cost", cost);
 
 
                     allWeaponsList.add(weaponEntry);
