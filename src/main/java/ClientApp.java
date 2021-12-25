@@ -46,7 +46,7 @@ public class ClientApp {
                     continue;
 
                 case "4": // Modes
-
+                    GamemodesMenu(myScanner, myCommunicator);
                     continue;
 
                 case "5": // Exits the program
@@ -161,6 +161,17 @@ public class ClientApp {
     }
 
 
+    private static void GamemodesMenu(Scanner myScanner, APICommunicator myCommunicator) {
+        List<String> allGamemodesInformation = null;
+        while (allGamemodesInformation == null) {
+            allGamemodesInformation = myCommunicator.pingGamemodesInfo();
+
+        }
+
+        printGamemodeInformation(allGamemodesInformation);
+        myScanner.nextLine();
+    }
+
 
                                                                 //prints relevant agents information
     private static void printAgentInformation (List< Map<String, String>> allAgentsInformation, int userChoice) {
@@ -193,14 +204,27 @@ public class ClientApp {
 
                                                                     //prints map information
     private static void printMapInformation (List<String> allMapInformation) {
-        System.out.println("\n");
+        System.out.println("\nMaps\n--------------- ");
 
         int i = 0;
         while (i < allMapInformation.size()) {
-            System.out.println("Map: " + allMapInformation.get(i));
+            System.out.println(allMapInformation.get(i));
             i++;
         }
 
         System.out.print("\n:: Push enter to return");
+    }
+
+    private static void printGamemodeInformation (List<String> allGamemodeInformation) {
+        System.out.println("\nGame Modes:\n------------- ");
+
+        int i = 0;
+        while (i < allGamemodeInformation.size()) {
+            System.out.println(allGamemodeInformation.get(i));
+            i++;
+
+        }
+
+        System.out.println("\n:: Push enter to return");
     }
 }

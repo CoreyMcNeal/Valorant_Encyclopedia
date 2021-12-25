@@ -124,7 +124,7 @@ public class APICommunicator {
         }
     }
 
-    public boolean pingModesInfo() {
+    public List<String> pingGamemodesInfo() {
 
         try {
             URL myURL = new URL("https://valorant-api.com/v1/gamemodes");
@@ -134,23 +134,25 @@ public class APICommunicator {
 
             int responseCode = myConn.getResponseCode();
             if (responseCode == 200) {
-//                getAgentJSON(myURL);
-                return true;
+                return getGamemodesJSON(myURL);
 
             } else {
-                System.out.println("Failed to connect");
-                return false;
+                System.out.println("\nFailed to connect\n" +
+                        "Push enter to retry connection");
+                this.myScanner.nextLine();
+
+                return null;
 
             }
 
 
         } catch (MalformedURLException e) {
             System.out.println("Error with URL");
-            return false;
+            return null;
 
         } catch (IOException e) {
             System.out.println("Error with HTTP conversion");
-            return false;
+            return null;
 
         }
     }
@@ -319,6 +321,7 @@ public class APICommunicator {
 
     }
 
+                                                                        // Grabs Valorant Map info from API
     private List<String> getMapJSON (URL myURL) {
 
         List<String> allMapList = new ArrayList<>();
@@ -362,4 +365,49 @@ public class APICommunicator {
         }
 
     }
+
+    private List<String> getGamemodesJSON (URL myURL) {
+
+        List <String> allGamemodesList = new ArrayList<>();
+
+        try {
+
+            StringBuilder content = new StringBuilder();
+            Scanner urlScanner = new Scanner(myURL.openStream());
+
+            while (urlScanner.hasNext()) {
+                content.append(urlScanner.nextLine());
+            }
+            urlScanner.close();
+
+            JSONParser myParser = new JSONParser();
+            JSONObject myDataObject = (JSONObject) myParser.parse(content.toString());
+
+            JSONArray myArrayObject = (JSONArray) myDataObject.get("data");
+
+            int posCounter = 0;
+            while (true) {
+
+                try {
+
+                    JSONObject data =  (JSONObject) myArrayObject.get(posCounter);
+                    String mapName = data.get("displayName").toString();
+
+                    allGamemodesList.add(mapName);
+                    posCounter++;
+
+                } catch(Exception e) {
+                    break;
+                }
+
+            }
+
+            return allGamemodesList;
+
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }
